@@ -307,16 +307,18 @@ The looping walkthrough below uses actual captures of the running local applicat
 
 ![Trace evaluation](docs/assets/05-trace-evaluation.png)
 
-### ### 5. Pictures
-(docs/assets/ss1.png)
-(docs/assets/ss2.png)
+### 5. Pictures
 
-(docs/assets/ss3.png)
+![Screenshot 1](docs/assets/ss1.png)
 
-(docs/assets/ss4.png)
+![Screenshot 2](docs/assets/ss2.png)
 
-(docs/assets/ss5.png)
+![Screenshot 3](docs/assets/ss3.png)
 
-(docs/assets/ss6.png)
+![Screenshot 4](docs/assets/ss4.png)
 
-(docs/assets/ss7.png)
+![Screenshot 5](docs/assets/ss5.png)
+
+![Screenshot 6](docs/assets/ss6.png)
+
+![Screenshot 7](docs/assets/ss7.png)
