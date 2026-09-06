@@ -1,0 +1,63 @@
+name: AI reliability gate
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+concurrency:
+  group: evaluation-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  evaluation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      DEMO_MODE: "true"
+      SEED_ON_START: "false"
+      DEEPEVAL_TELEMETRY_OPT_OUT: "YES"
+      LANGSMITH_TRACING: "false"
+      PYTEST_DISABLE_PLUGIN_AUTOLOAD: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Install free dependencies
+        run: |
+          pip install -e '.[dev]'
+          cd frontend && npm ci --ignore-scripts
+      - name: Unit and integration tests
+        run: python -m pytest backend/tests -q
+      - name: DeepEval offline suite (no paid judge)
+        run: python -m pytest evals -q
+      - name: Deterministic benchmark and deployment gate
+        run: python scripts/evaluate.py
+      - name: Lint
+        run: |
+          ruff check backend evals scripts
+          cd frontend && npm run lint
+      - name: Strict frontend build
+        run: cd frontend && npm run build
+      - name: Verify Docker deployment
+        run: |
+          cp .env.example .env
+          docker compose config --quiet
+          docker compose up --build -d --wait --wait-timeout 240
+          curl --fail http://localhost:3000/
+          curl --fail http://localhost:8000/health
+      - name: Preserve evaluation report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: evaluation-report
+          path: reports/
+      - name: Stop containers
+        if: always()
+        run: docker compose down

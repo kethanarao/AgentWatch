@@ -1,0 +1,222 @@
+[
+  {
+    "incident_id": "INC-1042",
+    "service": "checkout-api",
+    "symptoms": [
+      "CrashLoopBackOff",
+      "elevated errors"
+    ],
+    "root_cause": "CrashLoopBackOff misconfiguration",
+    "resolution": "Inspect kubectl logs POD --previous and kubectl describe pod POD. Check the last exit code and events. Exit 137 can indicate OOMKilled; exit 1 often indicates an application error. Verify command arguments, environment variables and mounted configuration before changing restart policy.",
+    "severity": "SEV1"
+  },
+  {
+    "incident_id": "INC-1043",
+    "service": "payments",
+    "symptoms": [
+      "ImagePullBackOff",
+      "elevated errors"
+    ],
+    "root_cause": "ImagePullBackOff misconfiguration",
+    "resolution": "Use kubectl describe pod POD to inspect image pull events. Verify the image tag exists in the registry, imagePullSecrets is valid, and the node can reach the registry. Pin an immutable digest and roll back to the previous known good revision when necessary.",
+    "severity": "SEV2"
+  },
+  {
+    "incident_id": "INC-1044",
+    "service": "inventory",
+    "symptoms": [
+      "Readiness probes",
+      "elevated errors"
+    ],
+    "root_cause": "Readiness probes misconfiguration",
+    "resolution": "Inspect readiness probe path, port, timeoutSeconds and initialDelaySeconds. Query the health endpoint inside the pod. Readiness failure removes the pod from service endpoints without restarting it. Confirm dependencies are ready and the application listens on the pod IP.",
+    "severity": "SEV2"
+  },
+  {
+    "incident_id": "INC-1045",
+    "service": "checkout-api",
+    "symptoms": [
+      "Liveness probes",
+      "elevated errors"
+    ],
+    "root_cause": "Liveness probes misconfiguration",
+    "resolution": "Liveness failures restart containers. Inspect failureThreshold and timeoutSeconds and avoid checking fragile external dependencies in liveness. Use a startup probe for slow initialization. Compare probe failures with application logs and CPU throttling.",
+    "severity": "SEV1"
+  },
+  {
+    "incident_id": "INC-1046",
+    "service": "payments",
+    "symptoms": [
+      "HTTP 503",
+      "elevated errors"
+    ],
+    "root_cause": "HTTP 503 misconfiguration",
+    "resolution": "A 503 indicates temporary unavailability. Inspect service endpoints, readiness probes, upstream health and ingress logs. Check kubectl get endpoints and verify selectors match pod labels. Correlate the error rate with deployments and capacity saturation.",
+    "severity": "SEV2"
+  },
+  {
+    "incident_id": "INC-1047",
+    "service": "inventory",
+    "symptoms": [
+      "P95 latency",
+      "elevated errors"
+    ],
+    "root_cause": "P95 latency misconfiguration",
+    "resolution": "Compare p50, p95 and p99 latency with request volume. Break down distributed traces into database, network and application spans. Check CPU throttling, connection pool saturation and cache misses. Optimize the bottleneck before increasing timeouts.",
+    "severity": "SEV2"
+  },
+  {
+    "incident_id": "INC-1048",
+    "service": "checkout-api",
+    "symptoms": [
+      "OOMKilled",
+      "elevated errors"
+    ],
+    "root_cause": "OOMKilled misconfiguration",
+    "resolution": "Inspect kubectl describe pod and previous logs for OOMKilled and exit code 137. Compare working set memory with the container limit. Profile heap growth and leaks, set sensible requests and limits, and validate changes under load.",
+    "severity": "SEV1"
+  },
+  {
+    "incident_id": "INC-1049",
+    "service": "payments",
+    "symptoms": [
+      "CPU throttling",
+      "elevated errors"
+    ],
+    "root_cause": "CPU throttling misconfiguration",
+    "resolution": "Compare container CPU usage with CPU limits and throttled periods. A low CPU limit can increase tail latency even when node CPU is available. Profile expensive code and test adjusted CPU requests and limits under representative load.",
+    "severity": "SEV2"
+  },
+  {
+    "incident_id": "INC-1050",
+    "service": "inventory",
+    "symptoms": [
+      "DNS resolution",
+      "elevated errors"
+    ],
+    "root_cause": "DNS resolution misconfiguration",
+    "resolution": "Run nslookup SERVICE.NAMESPACE.svc.cluster.local from a debug pod. Check CoreDNS logs and service endpoints. Inspect resolv.conf, search domains, ndots and NetworkPolicy rules for UDP and TCP port 53. Separate NXDOMAIN from timeouts.",
+    "severity": "SEV2"
+  },
+  {
+    "incident_id": "INC-1051",
+    "service": "checkout-api",
+    "symptoms": [
+      "NetworkPolicy",
+      "elevated errors"
+    ],
+    "root_cause": "NetworkPolicy misconfiguration",
+    "resolution": "Inspect ingress and egress NetworkPolicy selectors in both namespaces. Allow required destination ports and DNS. Test connectivity from a debug pod with matching labels. Confirm the cluster network plugin enforces NetworkPolicy.",
+    "severity": "SEV1"
+  },
+  {
+    "incident_id": "INC-1052",
+    "service": "payments",
+    "symptoms": [
+      "Pending pods",
+      "elevated errors"
+    ],
+    "root_cause": "Pending pods misconfiguration",
+    "resolution": "Inspect scheduling events using kubectl describe pod. Check insufficient CPU or memory, node selectors, affinity, taints and tolerations. Verify persistent volume claims are bound. Adjust requests only after measuring actual resource needs.",
+    "severity": "SEV2"
+  },
+  {
+    "incident_id": "INC-1053",
+    "service": "inventory",
+    "symptoms": [
+      "Deployment rollout",
+      "elevated errors"
+    ],
+    "root_cause": "Deployment rollout misconfiguration",
+    "resolution": "Run kubectl rollout status deployment/NAME and inspect ReplicaSets and events. Check readiness, image pulls and scheduling. Review maxSurge, maxUnavailable and progressDeadlineSeconds. Use kubectl rollout undo after confirming a release regression.",
+    "severity": "SEV2"
+  },
+  {
+    "incident_id": "INC-1054",
+    "service": "checkout-api",
+    "symptoms": [
+      "Docker exit codes",
+      "elevated errors"
+    ],
+    "root_cause": "Docker exit codes misconfiguration",
+    "resolution": "Inspect docker logs and docker inspect for exit code, command and state. The container stops when its main process exits. Verify entrypoint, executable permissions and environment configuration; keep the main process in the foreground.",
+    "severity": "SEV1"
+  },
+  {
+    "incident_id": "INC-1055",
+    "service": "payments",
+    "symptoms": [
+      "Docker build cache",
+      "elevated errors"
+    ],
+    "root_cause": "Docker build cache misconfiguration",
+    "resolution": "Inspect the Dockerfile COPY order and .dockerignore. Confirm the build context includes changed files. Rebuild with a unique tag and inspect the image digest. Use --no-cache as a diagnostic, then restore efficient cache layers.",
+    "severity": "SEV2"
+  },
+  {
+    "incident_id": "INC-1056",
+    "service": "inventory",
+    "symptoms": [
+      "HTTP 502",
+      "elevated errors"
+    ],
+    "root_cause": "HTTP 502 misconfiguration",
+    "resolution": "A 502 means a proxy received an invalid upstream response. Inspect ingress logs, upstream connection resets, protocol mismatch and application crashes. Verify the upstream port and TLS configuration, then correlate with pod restarts.",
+    "severity": "SEV2"
+  },
+  {
+    "incident_id": "INC-1057",
+    "service": "checkout-api",
+    "symptoms": [
+      "HTTP 504",
+      "elevated errors"
+    ],
+    "root_cause": "HTTP 504 misconfiguration",
+    "resolution": "A 504 means an upstream did not respond before the gateway deadline. Compare proxy timeouts with request duration and database spans. Investigate slow dependencies and propagate deadlines. Avoid masking saturation by only increasing timeouts.",
+    "severity": "SEV1"
+  },
+  {
+    "incident_id": "INC-1058",
+    "service": "payments",
+    "symptoms": [
+      "HTTP 429",
+      "elevated errors"
+    ],
+    "root_cause": "HTTP 429 misconfiguration",
+    "resolution": "A 429 indicates rate limiting. Honor Retry-After, apply exponential backoff with jitter and bound retries. Inspect quotas and request bursts. Retrying immediately can amplify overload and worsen availability.",
+    "severity": "SEV2"
+  },
+  {
+    "incident_id": "INC-1059",
+    "service": "inventory",
+    "symptoms": [
+      "Connection pools",
+      "elevated errors"
+    ],
+    "root_cause": "Connection pools misconfiguration",
+    "resolution": "Compare active, idle and waiting connections with pool capacity. Look for leaked connections, long transactions and slow queries. Set acquisition timeouts, close connections reliably and size pools against database capacity.",
+    "severity": "SEV2"
+  },
+  {
+    "incident_id": "INC-1060",
+    "service": "checkout-api",
+    "symptoms": [
+      "Memory leaks",
+      "elevated errors"
+    ],
+    "root_cause": "Memory leaks misconfiguration",
+    "resolution": "Chart heap and resident memory across comparable traffic. Capture heap profiles and compare retained allocations. Check unbounded caches, queued work and references. Use load tests to distinguish a leak from normal cache warmup.",
+    "severity": "SEV1"
+  },
+  {
+    "incident_id": "INC-1061",
+    "service": "payments",
+    "symptoms": [
+      "Disk pressure",
+      "elevated errors"
+    ],
+    "root_cause": "Disk pressure misconfiguration",
+    "resolution": "Inspect node conditions, ephemeral storage usage and eviction events. Check container logs, image layers and emptyDir volumes. Rotate logs and set ephemeral storage requests and limits; avoid deleting files without identifying ownership.",
+    "severity": "SEV2"
+  }
+]

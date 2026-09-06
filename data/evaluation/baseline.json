@@ -1,0 +1,19 @@
+{
+  "created_at": "2026-09-05T14:57:00.526695-05:00",
+  "mode": "demo",
+  "dataset_sha256": "0a569689ef919a00ed3ce3417af5851fa659ec86c119ecc73b2988ab28121504",
+  "metrics": {
+    "faithfulness": 1.0,
+    "context_precision": 0.3125,
+    "context_recall": 0.9375,
+    "answer_relevance": 0.6358366666666666,
+    "citation_accuracy": 1.0,
+    "trajectory_efficiency": 0.9939433333333334,
+    "tool_selection": 0.9833333333333333,
+    "safety": 1.0,
+    "p95_latency_ms": 150.92,
+    "tool_calls": 0.2833333333333333
+  },
+  "cases": 60,
+  "note": "Measured serial benchmark. Timing includes graph setup; demo waits are scaled to 0.02x. Latency regression has a configurable 100 ms deadband."
+}
